@@ -1,11 +1,9 @@
 # 📈 Mutual Fund Analytics Capstone
 
 ## 📝 Project Overview
-This repository contains the code, data pipelines, and analytical models for the **Mutual Fund Analytics Capstone Project**, developed as part of the **BlueStock Fintech Data Analyst Internship**.
+This repository contains the code, data pipelines, and analytical models for the **Mutual Fund Analytics Capstone Project**, developed as part of the BlueStock Fintech Data Analyst Internship.
 
 The objective of this project is to build an end-to-end data analytics pipeline that extracts live mutual fund data, processes historical financial datasets, and generates actionable investment insights using Python, SQL, and interactive dashboards.
-
----
 
 ## 🗂️ Project Structure
 
@@ -13,122 +11,57 @@ The objective of this project is to build an end-to-end data analytics pipeline 
 mutual_fund_analytics/
 │
 ├── data/
-│   ├── raw/                 # Unaltered CSV files and fetched API data
-│   └── processed/           # Cleaned and transformed datasets
+│   ├── raw/                 # Original downloaded CSV files and API data
+│   ├── processed/           # Cleaned and transformed datasets
+│   └── db/                  # bluestock_mf.db (SQLite database)
 │
-├── notebooks/               # Jupyter notebooks for EDA
-├── sql/                     # PostgreSQL scripts and queries
-├── dashboard/               # Flask API and visualization assets
-├── reports/                 # Final reports and presentations
+├── notebooks/               # Jupyter Notebooks for EDA and advanced analytics
+├── scripts/                 # Python ETL pipeline scripts (fetching, cleaning, loading)
+├── sql/                     # PostgreSQL/SQLite schema and analytical queries
+├── dashboard/               # Interactive dashboard assets (Power BI / Web App)
+├── reports/                 # Final PDF reports, presentations, and findings
 │
 ├── .gitignore
-├── data_ingestion.py
-├── live_nav_fetch.py
+├── data_dictionary.md
 ├── requirements.txt
 └── README.md
 ```
 
----
-
 ## 🛠️ Tech Stack & Tools
 
-### Programming
-- Python 3
-
-### Data Analysis
-- NumPy
-- Pandas
-
-### Data Visualization
-- Matplotlib
-- Seaborn
-- Plotly
-
-### Database
-- PostgreSQL
-- pgAdmin 4
-- SQLAlchemy
-
-### API Development
-- Flask
-- Requests
-
-### Development Environment
-- VS Code
-- Jupyter Notebook
-
----
+- **Programming:** Python 3
+- **Data Manipulation:** NumPy, Pandas
+- **Database Management:** SQLite, SQLAlchemy, SQL
+- **Data Visualization:** Matplotlib, Seaborn (Upcoming)
+- **Environment:** VS Code, Jupyter Notebook, Git/GitHub
 
 ## 🚀 Setup & Installation
-
-### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/mutual-fund-analytics.git
 cd mutual-fund-analytics
-```
-
-### 2. Install Dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-### 3. Fetch Live NAV Data
+### Run the ETL Pipeline
 
 ```bash
-python live_nav_fetch.py
+python scripts/live_nav_fetch.py
+python scripts/data_cleaning.py
+python scripts/db_loader.py
 ```
-
-### 4. Validate Local Datasets
-
-```bash
-python data_ingestion.py
-```
-
----
 
 ## 📊 Current Progress
 
 - ✅ Day 1: Project Setup & ETL
-  - Configured environment
-  - Built API extraction scripts
-  - Validated local CSV integrity
+- ✅ Day 2: Data Cleaning & SQL Database
 
-- ⬜ Day 2: Exploratory Data Analysis (EDA)
-  - Data cleaning
-  - Visualization using Pandas and Seaborn
+Developed during the **2026 BlueStock Fintech Data Analyst Internship**.
 
-- ⬜ Day 3: SQL & Database Integration
-  - Load processed data into PostgreSQL
-  - Develop business queries
-
-- ⬜ Day 4: API & Visualization
-  - Build Flask REST API
-  - Serve analytical insights
-
----
-
-## 🎯 Project Goals
-
-- Automate mutual fund data collection
-- Perform exploratory financial analysis
-- Store and query data using PostgreSQL
-- Build APIs for data access
-- Create dashboards for investment insights
-
----
-
-## 👨‍💻 Internship Project
-
-Developed as part of the **2026 BlueStock Fintech Data Analyst Internship**.
-
----
-
-## 📌 GitHub Update Commands
+## 🚀 Pushing the Update
 
 ```bash
 git add README.md
-git commit -m "Update README with professional structure and project overview"
+git commit -m "Update README with Day 2 progress and new folder structure"
 git push origin main
 ```

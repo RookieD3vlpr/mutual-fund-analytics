@@ -6,3 +6,6 @@ data/raw/
 
 # Ignore Python cache
 __pycache__/
+
+# Ignore SQLite databases
+*.db

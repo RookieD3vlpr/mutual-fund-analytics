@@ -19,7 +19,8 @@ mutual_fund_analytics/
 │   └── db/                  # bluestock_mf.db (SQLite database)
 │
 ├── notebooks/               # Jupyter Notebooks for EDA and advanced analytics
-│   └── 03_eda_analysis.ipynb
+│   ├── 03_eda_analysis.ipynb
+│   └── 04_performance_analytics.ipynb
 │
 ├── scripts/                 # Python ETL pipeline scripts (fetching, cleaning, loading)
 │
@@ -27,9 +28,12 @@ mutual_fund_analytics/
 │
 ├── dashboard/               # Interactive dashboard assets (Power BI / Web App)
 │
-├── reports/                 # Static charts, PDF reports, and presentations
+├── reports/                 # Static charts, CSV outputs, and presentations
+│   ├── alpha_beta.csv
 │   ├── aum_growth_sbi.png
+│   ├── benchmark_comparison.png
 │   ├── category_inflow_heatmap.png
+│   ├── fund_scorecard.csv
 │   ├── geographic_distribution.png
 │   ├── investor_demographics.png
 │   ├── nav_return_correlation.png
@@ -50,9 +54,10 @@ mutual_fund_analytics/
 ### Programming
 - Python 3
 
-### Data Manipulation
+### Data Manipulation & Analysis
 - NumPy
 - Pandas
+- SciPy
 
 ### Database Management
 - SQLite
@@ -64,7 +69,7 @@ mutual_fund_analytics/
 - Seaborn
 - Plotly
 
-### Environment
+### Development Environment
 - VS Code
 - Jupyter Notebook
 - Git/GitHub
@@ -72,8 +77,6 @@ mutual_fund_analytics/
 ---
 
 ## 🚀 Setup & Installation
-
-To run this project locally, follow these steps:
 
 ### 1. Clone the Repository
 
@@ -90,25 +93,29 @@ pip install -r requirements.txt
 
 ### 3. Run the ETL Pipeline
 
-#### Fetch Live Data
+#### Fetch Live Mutual Fund Data
 
 ```bash
 python scripts/live_nav_fetch.py
 ```
 
-#### Clean Historical Data
+#### Clean Historical Datasets
 
 ```bash
 python scripts/data_cleaning.py
 ```
 
-#### Load SQLite Database
+#### Load Data into SQLite
 
 ```bash
 python scripts/db_loader.py
 ```
 
-### 4. View Exploratory Data Analysis
+---
+
+## 📊 Analytics Notebooks
+
+### Exploratory Data Analysis
 
 Open:
 
@@ -116,92 +123,183 @@ Open:
 notebooks/03_eda_analysis.ipynb
 ```
 
-in **Jupyter Notebook** or **VS Code** to explore the complete EDA workflow and visualizations.
+This notebook contains:
+- AUM Growth Analysis
+- SIP Inflow Trends
+- Investor Demographics Analysis
+- Geographic Distribution Analysis
+- Sector Allocation Analysis
+- NAV Trend Analysis
+- Correlation Analysis
+- Category-wise Fund Performance Insights
+
+### Performance Analytics
+
+Open:
+
+```text
+notebooks/04_performance_analytics.ipynb
+```
+
+This notebook contains:
+- Daily Return Calculations
+- CAGR Analysis
+- Sharpe Ratio
+- Sortino Ratio
+- Alpha & Beta Estimation
+- Maximum Drawdown Analysis
+- Benchmark Comparison
+- Proprietary Fund Scorecard Model
 
 ---
 
-## 📊 Key Visualizations Generated
+## 📈 Key Insights Generated
 
-The EDA notebook generates the following insights and charts:
+### Exploratory Data Analysis
 
-1. AUM Growth Analysis
-2. SIP Inflow Trends
-3. NAV Trend Analysis
-4. NAV vs Returns Correlation
-5. Investor Demographics Distribution
-6. Geographic Investment Distribution
-7. Category-wise Fund Inflow Heatmap
-8. Sector Allocation Analysis
-9. Risk vs Return Comparison
-10. Mutual Fund Performance Dashboard
+- AUM Growth Trends
+- SIP Inflow Analysis
+- Category Inflow Heatmaps
+- Investor Demographics
+- Geographic Distribution
+- NAV Trend Analysis
+- Risk-Return Correlation Analysis
+- Sector Allocation Breakdown
+
+### Performance Analytics
+
+- CAGR Rankings
+- Sharpe Ratio Rankings
+- Sortino Ratio Rankings
+- Alpha/Beta Comparisons
+- Maximum Drawdown Evaluation
+- Benchmark Outperformance Analysis
+- Fund Scorecard Rankings
 
 ---
 
-## 📈 Current Progress
+## 📊 Current Progress
 
 ### ✅ Day 1: Project Setup & ETL
+
 - Configured development environment
 - Built API extraction scripts
 - Validated local CSV integrity
+- Created project structure
 
 ### ✅ Day 2: Data Cleaning & SQL Database
+
 - Cleaned datasets using Pandas
 - Designed Star Schema architecture
-- Loaded data into SQLite
-- Wrote analytical SQL queries
+- Loaded processed data into SQLite
+- Developed analytical SQL queries
 
 ### ✅ Day 3: Exploratory Data Analysis (EDA)
-- Completed deep-dive data analysis
-- Generated 10 key financial insights
-- Built interactive Plotly visualizations
-- Created statistical analysis reports
-- Produced business-ready charts and findings
 
-### ⬜ Day 4: Dashboards & Final Reporting
-- Building interactive dashboards
-- Creating presentation-ready reports
-- Finalizing project deliverables
+- Generated 10 analytical visualizations
+- Conducted trend analysis
+- Performed correlation analysis
+- Identified business insights
+- Created presentation-ready charts
 
----
+### ✅ Day 4: Fund Performance Analytics
 
-## 🎯 Project Outcomes
+- Computed Daily Returns
+- Calculated CAGR
+- Calculated Sharpe Ratio
+- Calculated Sortino Ratio
+- Calculated Alpha & Beta
+- Measured Maximum Drawdowns
+- Built Proprietary Fund Scorecard (0–100)
+- Generated Benchmark Comparison Charts
 
-By the end of this capstone project, the system will:
+### ⬜ Day 5: Dashboards & Final Reporting
 
-- Automate mutual fund data collection
-- Maintain a structured financial database
-- Generate actionable investment insights
-- Provide interactive analytical dashboards
-- Support data-driven investment decision-making
-
----
-
-## 👨‍💻 Internship Project
-
-Developed during the **2026 BlueStock Fintech Data Analyst Internship**.
+- Interactive Dashboard Development
+- Business Presentation Preparation
+- Final Report Compilation
+- Project Demonstration Assets
 
 ---
 
-## 🚀 Pushing the Update to GitHub
+## 📈 Project Status
 
-To lock in your completed Day 3 progress:
+| Module | Status |
+|----------|----------|
+| ETL Pipeline | ✅ Complete |
+| Data Cleaning | ✅ Complete |
+| Database Design | ✅ Complete |
+| SQL Analytics | ✅ Complete |
+| Exploratory Data Analysis | ✅ Complete |
+| Performance Analytics | ✅ Complete |
+| Dashboard Development | ⬜ In Progress |
+| Final Reporting | ⬜ In Progress |
+
+### Overall Completion
+
+**85% Complete** 🚀
+
+---
+
+## 📂 Outputs Generated
+
+### Charts
+
+- AUM Growth Analysis
+- SIP Inflow Trend Analysis
+- NAV Trend Analysis
+- NAV Return Correlation Matrix
+- Investor Demographics Visualization
+- Geographic Distribution Map
+- Category Inflow Heatmap
+- Sector Allocation Donut Chart
+- Benchmark Comparison Charts
+
+### Data Products
+
+- Alpha/Beta Dataset
+- Fund Scorecard Dataset
+- Processed Mutual Fund Database
+- SQL Analytics Reports
+
+---
+
+## 🎯 Project Objectives
+
+- Automate Mutual Fund Data Collection
+- Build a Scalable ETL Pipeline
+- Design a Relational Financial Database
+- Perform Quantitative Fund Analysis
+- Generate Investment Insights
+- Create Interactive Dashboards
+- Support Data-Driven Investment Decisions
+
+---
+
+## 👨‍💻 Internship Information
+
+**Organization:** BlueStock Fintech
+
+**Role:** Data Analyst Intern
+
+**Project:** Mutual Fund Analytics Capstone
+
+**Year:** 2026
+
+---
+
+## 🚀 Final GitHub Sync
+
+After updating the project files, push the latest changes:
 
 ```bash
 git add .
-git commit -m "Day 3: Completed EDA Notebook, generated 10 insights, updated README"
+git commit -m "Day 4: Completed performance analytics and updated project documentation"
 git push origin main
 ```
 
 ---
 
-### Repository Status
+## 📜 License
 
-**Progress:** 75% Complete ✅
-
-- ETL Pipeline → Completed
-- Data Cleaning → Completed
-- Database Design → Completed
-- SQL Analytics → Completed
-- Exploratory Data Analysis → Completed
-- Dashboard Development → In Progress
-- Final Reporting → In Progress
+This project is developed for educational and internship purposes as part of the BlueStock Fintech Data Analyst Internship Program.

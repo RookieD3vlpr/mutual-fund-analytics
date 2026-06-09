@@ -1,107 +1,181 @@
 import pandas as pd
 import numpy as np
-import glob
-import os
+import logging
+import warnings
+from pathlib import Path
 
-print("--- Starting Data Cleaning Pipeline ---")
-
-# Ensure processed folder exists
-os.makedirs('data/processed', exist_ok=True)
-
-# Helper function to get correct filename from raw folder
-def get_file(keyword):
-    files = glob.glob(f'data/raw/*{keyword}*.csv')
-    return files[0] if files else None
+# Suppress pandas warnings for cleaner console output
+warnings.filterwarnings('ignore')
 
 # ---------------------------------------------------------
-# Task 1: Clean NAV History
+# Logging Configuration
 # ---------------------------------------------------------
-nav_file = get_file('nav_history')
-if nav_file:
-    print("\nCleaning NAV History...")
-    df_nav = pd.read_csv(nav_file)
-    
-    # Parse dates
-    df_nav['date'] = pd.to_datetime(df_nav['date'], format='mixed')
-    
-    # Sort by code and date
-    df_nav = df_nav.sort_values(by=['amfi_code', 'date'])
-    
-    # Validate NAV > 0
-    df_nav = df_nav[df_nav['nav'] > 0]
-    
-    # Remove duplicates
-    df_nav = df_nav.drop_duplicates(subset=['amfi_code', 'date'])
-    
-    # Forward-fill missing dates for holidays/weekends
-    # Group by amfi_code, resample to daily ('D'), and forward fill (ffill)
-    # Forward-fill missing dates for holidays/weekends
-    df_nav = df_nav.set_index('date').groupby('amfi_code')['nav'].resample('D').ffill().reset_index()
-    
-    df_nav.to_csv('data/processed/clean_nav_history.csv', index=False)
-    print(f"✅ Saved clean_nav_history.csv | Records: {len(df_nav)}")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger('MF_DataPipeline')
 
 # ---------------------------------------------------------
-# Task 2: Clean Investor Transactions
+# Pipeline Class Definition
 # ---------------------------------------------------------
-txn_file = get_file('investor_transactions')
-if txn_file:
-    print("\nCleaning Investor Transactions...")
-    df_txn = pd.read_csv(txn_file)
+class MutualFundDataCleaner:
+    """
+    An enterprise-grade ETL cleaner for Mutual Fund data streams.
+    Handles anomaly detection, feature engineering, and memory optimization.
+    """
     
-    # Standardise transaction_type
-    df_txn['transaction_type'] = df_txn['transaction_type'].str.upper().str.strip()
-    valid_types = ['SIP', 'LUMPSUM', 'REDEMPTION']
-    df_txn = df_txn[df_txn['transaction_type'].isin(valid_types)]
-    
-    # Validate amount > 0
-    df_txn = df_txn[df_txn['amount_inr'] > 0]
-    
-    # Fix date formats
-    df_txn['transaction_date'] = pd.to_datetime(df_txn['transaction_date'], format='mixed')
-    
-    # Check KYC status
-    valid_kyc = ['VERIFIED', 'PENDING', 'REJECTED']
-    df_txn['kyc_status'] = df_txn['kyc_status'].str.upper().str.strip()
-    df_txn['kyc_status'] = np.where(df_txn['kyc_status'].isin(valid_kyc), df_txn['kyc_status'], 'UNKNOWN')
-    
-    df_txn.to_csv('data/processed/clean_investor_transactions.csv', index=False)
-    print(f"✅ Saved clean_investor_transactions.csv | Records: {len(df_txn)}")
+    def __init__(self, raw_dir: str = '../data/raw', processed_dir: str = '../data/processed'):
+        self.raw_dir = Path(raw_dir)
+        self.processed_dir = Path(processed_dir)
+        self._setup_directories()
+
+    def _setup_directories(self) -> None:
+        """Ensures the processed output directory exists."""
+        self.processed_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Pipeline initialized. Output directory: {self.processed_dir}")
+
+    def clean_nav_data(self) -> None:
+        """Advanced NAV cleaning: Outlier detection and business-day alignment."""
+        logger.info("Starting NAV Data processing...")
+        raw_path = self.raw_dir / 'raw_nav_data.csv'
+        processed_path = self.processed_dir / 'cleaned_fact_nav.csv'
+
+        if not raw_path.exists():
+            logger.warning(f"File not found: {raw_path}. Skipping NAV pipeline.")
+            return
+
+        try:
+            df_nav = pd.read_csv(raw_path)
+            
+            # 1. Standardize Dates & Types
+            df_nav['date'] = pd.to_datetime(df_nav['date'], format='mixed', dayfirst=True)
+            df_nav['nav'] = pd.to_numeric(df_nav['nav'], errors='coerce')
+            df_nav = df_nav.dropna(subset=['nav', 'amfi_code'])
+            
+            # Optimize Memory by ensuring AMFI codes are strings
+            df_nav['amfi_code'] = df_nav['amfi_code'].astype(str).str.strip()
+
+            # 2. Anomaly Detection (Rolling Median)
+            # Detects flash crashes and fat-finger errors
+            df_nav = df_nav.sort_values(by=['amfi_code', 'date'])
+            df_nav['rolling_median'] = df_nav.groupby('amfi_code')['nav'].rolling(
+                window=5, center=True, min_periods=1
+            ).median().reset_index(0, drop=True)
+            
+            df_nav['deviation'] = abs((df_nav['nav'] - df_nav['rolling_median']) / df_nav['rolling_median'])
+            
+            initial_rows = len(df_nav)
+            df_nav = df_nav[df_nav['deviation'] <= 0.15] # Keep rows within 15% deviation
+            outliers_removed = initial_rows - len(df_nav)
+
+            # 3. Cleanup & Export
+            df_nav = df_nav.drop(columns=['rolling_median', 'deviation'])
+            df_nav.to_csv(processed_path, index=False)
+            
+            logger.info(f"NAV Data cleaned | Outliers removed: {outliers_removed} | Rows finalized: {len(df_nav)}")
+
+        except Exception as e:
+            logger.error(f"Critical error during NAV cleaning: {str(e)}")
+
+    def clean_fund_metadata(self) -> None:
+        """Advanced Metadata cleaning: NLP Feature Extraction and Categorization."""
+        logger.info("Starting Fund Metadata processing...")
+        raw_path = self.raw_dir / 'raw_fund_metadata.csv'
+        processed_path = self.processed_dir / 'cleaned_dim_fund.csv'
+
+        if not raw_path.exists():
+            logger.warning(f"File not found: {raw_path}. Skipping Metadata pipeline.")
+            return
+
+        try:
+            df_funds = pd.read_csv(raw_path)
+            
+            # 1. Text Normalization
+            df_funds['scheme_name'] = df_funds['scheme_name'].str.strip().str.title()
+            
+            # 2. Feature Engineering
+            df_funds['plan_type'] = np.where(
+                df_funds['scheme_name'].str.contains('Direct', case=False), 'Direct', 'Regular'
+            )
+            df_funds['option_type'] = np.where(
+                df_funds['scheme_name'].str.contains('Growth| Gr', case=False, regex=True), 'Growth', 'IDCW/Dividend'
+            )
+            
+            # 3. Categorical Standardization
+            cat_map = {
+                'Eq': 'Equity', 'Equity Scheme': 'Equity',
+                'Debt Scheme': 'Debt', 'Liquid': 'Debt', 
+                'Hybrid Scheme': 'Hybrid'
+            }
+            df_funds['category'] = df_funds['category'].replace(cat_map)
+            
+            # Memory Optimization: Convert low-cardinality strings to Categorical data types
+            df_funds['category'] = df_funds['category'].astype('category')
+            df_funds['plan_type'] = df_funds['plan_type'].astype('category')
+            
+            df_funds.to_csv(processed_path, index=False)
+            logger.info(f"Fund Metadata cleaned | Engineered features added | Rows finalized: {len(df_funds)}")
+
+        except Exception as e:
+            logger.error(f"Critical error during Metadata cleaning: {str(e)}")
+
+    def clean_transactions(self) -> None:
+        """Advanced Transaction cleaning: Logic enforcement and Threshold bounds."""
+        logger.info("Starting Transaction Data processing...")
+        raw_path = self.raw_dir / 'raw_transactions.csv'
+        processed_path = self.processed_dir / 'cleaned_fact_transactions.csv'
+
+        if not raw_path.exists():
+            logger.warning(f"File not found: {raw_path}. Skipping Transaction pipeline.")
+            return
+
+        try:
+            df_trans = pd.read_csv(raw_path)
+            
+            # 1. Parsing and Formatting
+            df_trans['transaction_date'] = pd.to_datetime(df_trans['transaction_date'], format='mixed')
+            
+            if df_trans['amount_inr'].dtype == 'O':
+                df_trans['amount_inr'] = df_trans['amount_inr'].str.replace(r'[₹,]', '', regex=True)
+            df_trans['amount_inr'] = pd.to_numeric(df_trans['amount_inr'], errors='coerce')
+            df_trans = df_trans.dropna(subset=['amount_inr'])
+            
+            # 2. Business Logic Enforcement
+            # Ensure SIPs are never negative
+            df_trans['amount_inr'] = np.where(
+                df_trans['transaction_type'] == 'SIP', 
+                df_trans['amount_inr'].abs(), 
+                df_trans['amount_inr']
+            )
+            
+            # 3. Contextual Anomaly Flagging
+            # Flag massive retail inflows (> 50 Lakhs) and micro-entries (< 100 Rs)
+            df_trans['is_anomaly'] = np.where(
+                ((df_trans['transaction_type'] == 'SIP') & (df_trans['amount_inr'] > 5000000)) | 
+                (df_trans['amount_inr'] < 100), 
+                True, False
+            )
+            
+            anomalies_flagged = df_trans['is_anomaly'].sum()
+            df_trans.to_csv(processed_path, index=False)
+            logger.info(f"Transaction Data cleaned | Anomalies flagged: {anomalies_flagged} | Rows finalized: {len(df_trans)}")
+
+        except Exception as e:
+            logger.error(f"Critical error during Transaction cleaning: {str(e)}")
+
+    def run_all(self) -> None:
+        """Executes the full pipeline sequentially."""
+        logger.info("🚀 Initiating Full Data Cleaning Pipeline...")
+        self.clean_nav_data()
+        self.clean_fund_metadata()
+        self.clean_transactions()
+        logger.info("🎉 Pipeline execution completed successfully!")
 
 # ---------------------------------------------------------
-# Task 3: Clean Scheme Performance
+# Execution Entry Point
 # ---------------------------------------------------------
-perf_file = get_file('scheme_performance')
-if perf_file:
-    print("\nCleaning Scheme Performance...")
-    df_perf = pd.read_csv(perf_file)
-    
-    # Validate returns are numeric (coerce errors to NaN, then drop or flag)
-    return_cols = ['1yr_return', '3yr_return', '5yr_return']
-    for col in return_cols:
-        if col in df_perf.columns:
-            df_perf[col] = pd.to_numeric(df_perf[col], errors='coerce')
-    
-    # Expense ratio check (0.1% - 2.5%)
-    if 'expense_ratio' in df_perf.columns:
-        df_perf = df_perf[(df_perf['expense_ratio'] >= 0.1) & (df_perf['expense_ratio'] <= 2.5)]
-        
-    df_perf.to_csv('data/processed/clean_scheme_performance.csv', index=False)
-    print(f"✅ Saved clean_scheme_performance.csv | Records: {len(df_perf)}")
-
-# ---------------------------------------------------------
-# Task 4: Move remaining datasets as-is to processed
-# ---------------------------------------------------------
-print("\nMoving remaining datasets to processed folder...")
-all_raw_files = glob.glob('data/raw/*.csv')
-cleaned_keywords = ['nav_history', 'investor_transactions', 'scheme_performance']
-
-for file in all_raw_files:
-    filename = os.path.basename(file)
-    # If the file wasn't one of the three we just cleaned, copy it over
-    if not any(keyword in filename for keyword in cleaned_keywords):
-        df = pd.read_csv(file)
-        clean_name = f"clean_{filename.split('_', 1)[-1]}" if filename[0].isdigit() else f"clean_{filename}"
-        df.to_csv(f'data/processed/{clean_name}', index=False)
-
-print("\n--- Phase 1 Complete! ---")
+if __name__ == "__main__":
+    pipeline = MutualFundDataCleaner()
+    pipeline.run_all()

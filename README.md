@@ -1,224 +1,322 @@
-# 📈 Mutual Fund Analytics Capstone
+# 📊 End-to-End Mutual Fund Analytics Pipeline & Recommender Engine
 
-## 📝 Project Overview
-
-This repository contains the code, data pipelines, and analytical models for the **Mutual Fund Analytics Capstone Project**, developed as part of the **BlueStock Fintech Data Analyst Internship**.
-
-The objective of this project is to build an end-to-end data analytics pipeline that extracts live mutual fund data, processes historical financial datasets, and generates actionable investment insights using Python, SQL, and interactive dashboards.
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
 
 ---
 
-## 🗂️ Project Structure
+# 📈 End-to-End Mutual Fund Analytics Pipeline & Recommender Engine
+
+## 📝 Overview
+
+This repository contains a comprehensive, production-grade **Data Engineering, Analytics, and Investment Recommendation Pipeline** built for the mutual fund industry.
+
+The project ingests raw financial datasets, performs automated data cleaning and anomaly detection, transforms the data into a relational SQL Star Schema, computes institutional-grade performance and risk metrics, and visualizes insights through an interactive Power BI dashboard.
+
+The capstone culminates in an intelligent **CLI-Based Mutual Fund Recommender Engine** that suggests optimized schemes based on investor risk appetite and quantitative performance metrics.
+
+---
+
+## ✨ Key Capabilities & Features
+
+### 🔹 1. Robust Data Engineering (ETL)
+
+- Automated data cleaning and validation
+- Detection and correction of anomalous NAV values
+- Rolling-median outlier filtering
+- Feature engineering from mutual fund metadata
+- Classification of:
+  - Direct vs Regular Plans
+  - Growth vs IDCW Options
+- Transaction validation and business rule enforcement
+- Detection of unusually large retail inflows (> ₹50 Lakhs)
+
+---
+
+### 🔹 2. Quantitative Performance Analytics
+
+Computed advanced financial performance metrics across multiple mutual fund schemes benchmarked against the Nifty 50 Index.
+
+#### Returns Metrics
+
+- Daily Returns
+- 1-Year CAGR
+- 3-Year CAGR
+
+#### Risk Metrics
+
+- Annualized Volatility
+- Maximum Drawdown
+- Historical VaR (95%)
+- Conditional VaR (CVaR)
+
+#### Risk-Adjusted Metrics
+
+- Sharpe Ratio
+- Sortino Ratio
+- Alpha (Outperformance)
+- Beta (Market Sensitivity)
+
+#### Proprietary Ranking Model
+
+- Fund Scorecard (0–100)
+- Risk-adjusted ranking methodology
+- Multi-factor performance evaluation
+
+---
+
+### 🔹 3. Advanced Risk & Behavioral Modeling
+
+#### Concentration Risk Analysis
+
+- Herfindahl-Hirschman Index (HHI)
+- Sector concentration monitoring
+- Portfolio diversification assessment
+
+#### Rolling Risk Analytics
+
+- 90-Day Rolling Sharpe Ratio
+- Dynamic volatility tracking
+- Risk instability detection
+
+#### Investor Cohort Analysis
+
+- Investor vintage tracking
+- SIP continuity analysis
+- Churn prediction indicators
+- Detection of inactive investors (>35 days)
+
+---
+
+### 🔹 4. Interactive Power BI Dashboard
+
+A fully interactive multi-page executive dashboard featuring:
+
+### Industry Overview
+
+- Total AUM KPIs
+- Industry-wide SIP volumes
+- Historical growth trends
+- Fund category distributions
+
+### Fund Performance
+
+- Risk vs Return Scatter Plot
+- Benchmark comparisons
+- Interactive Fund Scorecards
+- Performance rankings
+
+### Investor Demographics
+
+- Geographic investment heatmaps
+- Age-group participation analysis
+- SIP vs Lumpsum behavior
+- Investor segmentation
+
+### Market Trends
+
+- SIP Inflows vs Benchmark Index
+- Category-wise inflow heatmaps
+- Sector allocation trends
+- Market sentiment indicators
+
+---
+
+## 📂 Project Structure
 
 ```text
 mutual_fund_analytics/
 │
 ├── data/
-│   ├── raw/                 # Original downloaded CSV files and API data
-│   ├── processed/           # Cleaned and transformed datasets
-│   └── db/                  # bluestock_mf.db (SQLite database)
+│   ├── raw/                         # Raw, uncleaned CSV files
+│   └── processed/                   # Cleaned fact and dimension tables
 │
-├── notebooks/               # Jupyter Notebooks for EDA and advanced analytics
+├── db/
+│   └── bluestock_mf.db              # SQLite Database (Star Schema)
+│
+├── notebooks/
 │   ├── 03_eda_analysis.ipynb
-│   └── 04_performance_analytics.ipynb
+│   ├── 04_performance_analytics.ipynb
+│   └── Advanced_Analytics.ipynb     # VaR, HHI & Cohort Analysis
 │
-├── scripts/                 # Python ETL pipeline scripts (fetching, cleaning, loading)
+├── scripts/
+│   ├── data_cleaning.py             # ETL & Data Validation Pipeline
+│   └── recommender.py               # CLI Recommendation Engine
 │
-├── sql/                     # PostgreSQL/SQLite schema and analytical queries
-│
-├── dashboard/               # Interactive dashboard assets (Power BI / Web App)
-│
-├── reports/                 # Static charts, CSV outputs, and presentations
-│   ├── alpha_beta.csv
-│   ├── aum_growth_sbi.png
-│   ├── benchmark_comparison.png
-│   ├── category_inflow_heatmap.png
+├── reports/
 │   ├── fund_scorecard.csv
-│   ├── geographic_distribution.png
-│   ├── investor_demographics.png
-│   ├── nav_return_correlation.png
-│   ├── nav_trend_analysis.png
-│   ├── sector_allocation_donut.png
-│   └── sip_inflow_trend.png
+│   ├── var_cvar_report.csv
+│   └── *.png                        # Generated Charts & Visuals
 │
-├── .gitignore               # Excluded files (e.g., *.db files, virtual environments)
-├── data_dictionary.md       # Business definitions and schema documentation
-├── requirements.txt         # Python library dependencies
-└── README.md                # Project documentation
+├── dashboard/
+│   ├── bluestock_mf_dashboard.pbix
+│   └── Dashboard.pdf
+│
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## 🛠️ Tech Stack & Tools
+## 🛠️ Technology Stack
 
 ### Programming
+
 - Python 3
 
-### Data Manipulation & Analysis
-- NumPy
+### Data Engineering
+
 - Pandas
+- NumPy
 - SciPy
 
-### Database Management
+### Database
+
 - SQLite
 - SQLAlchemy
 - SQL
 
-### Data Visualization
+### Visualization
+
 - Matplotlib
 - Seaborn
 - Plotly
+- Power BI
 
 ### Development Environment
+
 - VS Code
 - Jupyter Notebook
-- Git/GitHub
+- Git & GitHub
 
 ---
 
-## 🚀 Setup & Installation
+## 🚀 Quick Start
 
-### 1. Clone the Repository
+### 1️⃣ Clone the Repository
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/mutual-fund-analytics.git
 cd mutual-fund-analytics
 ```
 
-### 2. Install Required Dependencies
+### 2️⃣ Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Run the ETL Pipeline
+### 3️⃣ Run the Data Pipeline
 
-#### Fetch Live Mutual Fund Data
-
-```bash
-python scripts/live_nav_fetch.py
-```
-
-#### Clean Historical Datasets
+Execute the ETL and anomaly detection workflow:
 
 ```bash
 python scripts/data_cleaning.py
 ```
 
-#### Load Data into SQLite
+This will:
+
+- Clean raw datasets
+- Detect NAV anomalies
+- Engineer features
+- Generate processed tables
+- Populate the SQLite database
+
+---
+
+## 🤖 Launch the Recommender Engine
+
+Run the command-line recommendation engine:
 
 ```bash
-python scripts/db_loader.py
+python scripts/recommender.py
 ```
 
----
+### User Inputs
 
-## 📊 Analytics Notebooks
+Select a risk profile:
 
-### Exploratory Data Analysis
+- Low Risk
+- Moderate Risk
+- High Risk
 
-Open:
+### Engine Outputs
 
-```text
-notebooks/03_eda_analysis.ipynb
-```
+Returns the:
 
-This notebook contains:
-- AUM Growth Analysis
-- SIP Inflow Trends
-- Investor Demographics Analysis
-- Geographic Distribution Analysis
-- Sector Allocation Analysis
-- NAV Trend Analysis
-- Correlation Analysis
-- Category-wise Fund Performance Insights
-
-### Performance Analytics
-
-Open:
-
-```text
-notebooks/04_performance_analytics.ipynb
-```
-
-This notebook contains:
-- Daily Return Calculations
-- CAGR Analysis
-- Sharpe Ratio
-- Sortino Ratio
-- Alpha & Beta Estimation
-- Maximum Drawdown Analysis
-- Benchmark Comparison
-- Proprietary Fund Scorecard Model
-
----
-
-## 📈 Key Insights Generated
-
-### Exploratory Data Analysis
-
-- AUM Growth Trends
-- SIP Inflow Analysis
-- Category Inflow Heatmaps
-- Investor Demographics
-- Geographic Distribution
-- NAV Trend Analysis
-- Risk-Return Correlation Analysis
-- Sector Allocation Breakdown
-
-### Performance Analytics
-
-- CAGR Rankings
-- Sharpe Ratio Rankings
-- Sortino Ratio Rankings
-- Alpha/Beta Comparisons
-- Maximum Drawdown Evaluation
-- Benchmark Outperformance Analysis
+- Top 3 Recommended Schemes
+- Sharpe Ratios
+- CAGR Scores
 - Fund Scorecard Rankings
 
 ---
 
-## 📊 Current Progress
+## 📈 Dashboard Preview
 
-### ✅ Day 1: Project Setup & ETL
+### Risk vs Return Analysis
 
-- Configured development environment
-- Built API extraction scripts
-- Validated local CSV integrity
-- Created project structure
+Visualizes the efficient frontier of tracked mutual fund schemes using:
 
-### ✅ Day 2: Data Cleaning & SQL Database
+- Expected Return
+- Annualized Volatility
+- Fund AUM
 
-- Cleaned datasets using Pandas
-- Designed Star Schema architecture
-- Loaded processed data into SQLite
-- Developed analytical SQL queries
+### Category Flow Heatmaps
 
-### ✅ Day 3: Exploratory Data Analysis (EDA)
+Tracks capital movement across:
 
-- Generated 10 analytical visualizations
-- Conducted trend analysis
-- Performed correlation analysis
-- Identified business insights
-- Created presentation-ready charts
+- Equity Funds
+- Debt Funds
+- Hybrid Funds
 
-### ✅ Day 4: Fund Performance Analytics
+over a multi-year period.
 
-- Computed Daily Returns
-- Calculated CAGR
-- Calculated Sharpe Ratio
-- Calculated Sortino Ratio
-- Calculated Alpha & Beta
-- Measured Maximum Drawdowns
-- Built Proprietary Fund Scorecard (0–100)
-- Generated Benchmark Comparison Charts
+### Executive KPI Monitoring
 
-### ⬜ Day 5: Dashboards & Final Reporting
+Displays:
 
-- Interactive Dashboard Development
-- Business Presentation Preparation
-- Final Report Compilation
-- Project Demonstration Assets
+- Total Industry AUM
+- SIP Volumes
+- Investor Growth Trends
+- Category Performance Metrics
+
+---
+
+## 📊 Analytical Outputs
+
+### Generated Reports
+
+- Fund Scorecard
+- Alpha/Beta Analysis
+- VaR & CVaR Reports
+- Cohort Analysis Reports
+- Benchmark Comparison Reports
+
+### Visualizations
+
+- Risk vs Return Scatter Plots
+- Rolling Sharpe Ratio Charts
+- SIP Trend Analysis
+- Investor Demographic Visuals
+- Geographic Distribution Maps
+- Sector Allocation Charts
+- Category Heatmaps
+
+---
+
+## 🎯 Project Outcomes
+
+This project demonstrates:
+
+- End-to-End Data Engineering
+- Financial Data Analytics
+- Quantitative Risk Modeling
+- Database Design
+- Dashboard Development
+- Portfolio Recommendation Systems
+- Business Intelligence Reporting
 
 ---
 
@@ -226,75 +324,39 @@ This notebook contains:
 
 | Module | Status |
 |----------|----------|
-| ETL Pipeline | ✅ Complete |
-| Data Cleaning | ✅ Complete |
-| Database Design | ✅ Complete |
-| SQL Analytics | ✅ Complete |
+| Data Engineering Pipeline | ✅ Complete |
+| Data Cleaning & Validation | ✅ Complete |
+| SQL Database Design | ✅ Complete |
 | Exploratory Data Analysis | ✅ Complete |
 | Performance Analytics | ✅ Complete |
-| Dashboard Development | ⬜ In Progress |
-| Final Reporting | ⬜ In Progress |
+| Risk Modeling | ✅ Complete |
+| Fund Recommendation Engine | ✅ Complete |
+| Power BI Dashboard | 🚧 In Progress |
+| Final Reporting | 🚧 In Progress |
 
-### Overall Completion
+### Overall Progress
 
-**85% Complete** 🚀
-
----
-
-## 📂 Outputs Generated
-
-### Charts
-
-- AUM Growth Analysis
-- SIP Inflow Trend Analysis
-- NAV Trend Analysis
-- NAV Return Correlation Matrix
-- Investor Demographics Visualization
-- Geographic Distribution Map
-- Category Inflow Heatmap
-- Sector Allocation Donut Chart
-- Benchmark Comparison Charts
-
-### Data Products
-
-- Alpha/Beta Dataset
-- Fund Scorecard Dataset
-- Processed Mutual Fund Database
-- SQL Analytics Reports
+**90% Complete 🚀**
 
 ---
 
-## 🎯 Project Objectives
+## 👨‍💻 Capstone Information
 
-- Automate Mutual Fund Data Collection
-- Build a Scalable ETL Pipeline
-- Design a Relational Financial Database
-- Perform Quantitative Fund Analysis
-- Generate Investment Insights
-- Create Interactive Dashboards
-- Support Data-Driven Investment Decisions
+**Program:** BlueStock FinTech Engineering Track
 
----
+**Project:** End-to-End Mutual Fund Analytics Pipeline & Recommender Engine
 
-## 👨‍💻 Internship Information
-
-**Organization:** BlueStock Fintech
-
-**Role:** Data Analyst Intern
-
-**Project:** Mutual Fund Analytics Capstone
+**Domain:** Financial Analytics & Investment Intelligence
 
 **Year:** 2026
 
 ---
 
-## 🚀 Final GitHub Sync
-
-After updating the project files, push the latest changes:
+## 🚀 GitHub Sync
 
 ```bash
-git add .
-git commit -m "Day 4: Completed performance analytics and updated project documentation"
+git add README.md
+git commit -m "Added professional project documentation"
 git push origin main
 ```
 
@@ -302,4 +364,4 @@ git push origin main
 
 ## 📜 License
 
-This project is developed for educational and internship purposes as part of the BlueStock Fintech Data Analyst Internship Program.
+This project was developed for educational, research, and internship purposes as part of the BlueStock FinTech Engineering Track.
